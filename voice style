@@ -1,0 +1,3 @@
+voice_style = st.selectbox("Choose Voice Style", [
+    "Clear Male", "Friendly Female", "Narrator", "Youth Voice", "Tok Pisin"
+])
