@@ -1,0 +1,1 @@
+tts = gTTS(text=text, lang=lang_code, slow=slow_voice)
