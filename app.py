@@ -4,11 +4,15 @@ import edge_tts
 import os
 
 # Set page title
-st.set_page_config(page_title="Talking Text: PNG Text-to-Speech")st.markdown(
+st.set_page_config(page_title="Talking Text: PNG Text-to-Speech")
+
+# Set background image
+background_url = "https://raw.githubusercontent.com/LukeMKwaka494/app.py/main/BackgroundEraser_20250504_094053758.png"
+st.markdown(
     f"""
     <style>
     .stApp {{
-        background-image: url("https://raw.githubusercontent.com/LukeMKwaka494/app.py/1454871accdd8c3e6194b2aeb49bd736c5734bbc/BackgroundEraser_20250504_094053758.png");
+        background-image: url("{background_url}");
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -19,6 +23,7 @@ st.set_page_config(page_title="Talking Text: PNG Text-to-Speech")st.markdown(
     unsafe_allow_html=True
 )
 
+# App title and instructions
 st.title("Talking Text: PNG Text-to-Speech")
 st.write("Write something in English or Tok Pisin, and this app will speak it for you.")
 
@@ -33,7 +38,7 @@ voice_option = st.selectbox("Choose a voice:", [
     "en-US-JennyNeural"     # American Female
 ])
 
-# Button to speak
+# Speak button
 if st.button("Speak"):
     if user_text.strip():
         async def speak():
@@ -42,13 +47,10 @@ if st.button("Speak"):
 
         asyncio.run(speak())
 
-        # Play the audio in the app
-        audio_file = open("output.mp3", "rb")
-        st.audio(audio_file.read(), format="audio/mp3")
-        audio_file.close()
+        # Play the audio
+        with open("output.mp3", "rb") as audio_file:
+            st.audio(audio_file.read(), format="audio/mp3")
 
-        # Remove the file after playing
         os.remove("output.mp3")
     else:
         st.warning("Please enter some text first.")
-        edge-tts
