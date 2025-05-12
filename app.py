@@ -4,7 +4,20 @@ import edge_tts
 import os
 
 # Set page title
-st.set_page_config(page_title="Talking Text: PNG Text-to-Speech")
+st.set_page_config(page_title="Talking Text: PNG Text-to-Speech")st.markdown(
+    f"""
+    <style>
+    .stApp {{
+        background-image: url("https://raw.githubusercontent.com/LukeMKwaka494/app.py/1454871accdd8c3e6194b2aeb49bd736c5734bbc/BackgroundEraser_20250504_094053758.png");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }}
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 st.title("Talking Text: PNG Text-to-Speech")
 st.write("Write something in English or Tok Pisin, and this app will speak it for you.")
