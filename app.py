@@ -1,23 +1,41 @@
 import streamlit as st
-from gtts import gTTS
+import asyncio
+import edge_tts
+import os
 
-# Set page info
-st.set_page_config(page_title="Talking Text", page_icon="🗣️")
+# Set page title
+st.set_page_config(page_title="Talking Text: PNG Text-to-Speech")
 
-# App Header
-st.title("**Talking Text: PNG Text-to-Speech**")
+st.title("Talking Text: PNG Text-to-Speech")
 st.write("Write something in English or Tok Pisin, and this app will speak it for you.")
 
-# Input field
-text = st.text_area("Enter your text here:", height=150)
-lang = st.selectbox("Choose Language", ["English", "Tok Pisin"])
-lang_code = "en" if lang == "English" else "tpi"
+# User input
+user_text = st.text_area("Enter your text here:")
 
-# Speak Button
+# Voice selection
+voice_option = st.selectbox("Choose a voice:", [
+    "en-AU-WilliamNeural",  # Australian Male
+    "en-AU-AnnetteNeural",  # Australian Female
+    "en-GB-RyanNeural",     # British Male
+    "en-US-JennyNeural"     # American Female
+])
+
+# Button to speak
 if st.button("Speak"):
-    if text.strip() != "":
-        tts = gTTS(text=text, lang=lang_code)
-        tts.save("output.mp3")
-        st.audio("output.mp3", format="audio/mp3")
+    if user_text.strip():
+        async def speak():
+            tts = edge_tts.Communicate(user_text, voice_option)
+            await tts.save("output.mp3")
+
+        asyncio.run(speak())
+
+        # Play the audio in the app
+        audio_file = open("output.mp3", "rb")
+        st.audio(audio_file.read(), format="audio/mp3")
+        audio_file.close()
+
+        # Remove the file after playing
+        os.remove("output.mp3")
     else:
         st.warning("Please enter some text first.")
+        edge-tts
