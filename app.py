@@ -1,7 +1,7 @@
 st. as st
 impor requests
 impor base64
-st.
+
 requests
 gtts
 # Page config
