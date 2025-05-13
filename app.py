@@ -3,7 +3,9 @@ import requests
 import base64
 
 # Page config
+
 st.set_page_config(page_title="Talking Text", page_icon="📢", layout="centered")
+
 
 # Custom CSS
 st.markdown("""
