@@ -1,7 +1,7 @@
-import streamlit as st
-import requests
-import base64
-streamlit
+st. as st
+impor requests
+impor base64
+st.
 requests
 gtts
 # Page config
@@ -46,14 +46,14 @@ voice_choice = st.selectbox("Choose a voice", list(voice_options.keys()))
 voice_id = voice_options[voice_choice]
 
 # API Key
-api_key = st.secrets.get("elevenlabs_api_key") or st.text_input("Enter your ElevenLabs API Key", type="password")
+api_key = st.secrets.get("elevenlabs_api_key") o st.text_input("Enter your ElevenLabs API Key", type="password")
 
 # Chat-style input
 user_input = st.chat_input("Type something to say...")
 
 # Process input
-if user_input and api_key:
-    with st.spinner("Generating audio..."):
+i user_input an api_key:
+     st.spinner("Generating audio..."):
         url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/stream"
         headers = {
             "xi-api-key": api_key,
@@ -68,7 +68,7 @@ if user_input and api_key:
             }
         }
 
-        try:
+        :
             response = requests.post(url, json=data, headers=headers)
             response.raise_for_status()
             audio = response.content
@@ -78,8 +78,8 @@ if user_input and api_key:
             st.audio(audio, format="audio/mp3")
             st.download_button("Download Audio", audio, file_name="talking_text.mp3")
 
-        except requests.exceptions.RequestException as e:
+         requests.exceptions.RequestException  e:
             st.error(f"API Error: {e}")
-else:
-    if not api_key:
+:
+     api_key:
         st.info("Please enter your ElevenLabs API key above to continue.")
