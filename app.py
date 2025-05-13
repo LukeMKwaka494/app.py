@@ -1,7 +1,9 @@
 import streamlit as st
 import requests
 import base64
-
+streamlit
+requests
+gtts
 # Page config
 
 st.set_page_config(page_title="Talking Text", page_icon="📢", layout="centered")
