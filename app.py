@@ -1,73 +1,89 @@
 import streamlit as st
-from pathlib import Path
-import base64
 import requests
-from io import BytesIO
-from gtts import gTTS
-from pydub import AudioSegment
+import base64
+import time
 
 # Set page config
-st.set_page_config(page_title="Talking Text", layout="centered")
+st.set_page_config(page_title="Talking Text", page_icon="🗣️", layout="centered")
 
-# Custom CSS for background image and styling
-page_bg_img = '''
-<style>
-[data-testid="stAppViewContainer"] {
-    background-image: url("https://images.unsplash.com/photo-1511452885600-a2d4b36a27b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80");
-    background-size: cover;
-    background-position: center;
-}
-[data-testid="stHeader"], [data-testid="stToolbar"] {
-    background: rgba(0,0,0,0);
-}
-</style>
-'''
-st.markdown(page_bg_img, unsafe_allow_html=True)
-
-# App title and UI
-st.markdown("<h1 style='text-align: center; color: white;'>Talking Text</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: white;'>Type your text and hear it out loud in your accent of choice.</p>", unsafe_allow_html=True)
-
-# Voice accent options
-accent = st.selectbox("Choose an accent", ["PNG", "Australian", "American"])
-
-# Text input
-text = st.text_area("Enter text to speak", max_chars=500)
-
-# Optional: Upload your voice file (not for synthesis, just for display)
-uploaded_audio = st.file_uploader("Upload a voice recording (optional)", type=["mp3", "wav"])
-
-# Convert text to speech
-if st.button("Speak"):
-    if text.strip() == "":
-        st.warning("Please enter some text.")
-    else:
-        # Map accent to language code (gTTS limitation workaround)
-        lang_map = {
-            "PNG": "en",
-            "Australian": "en",
-            "American": "en"
+# Custom CSS
+st.markdown("""
+    <style>
+        body {
+            background-color: #f0f2f6;
         }
-        lang = lang_map.get(accent, "en")
-        
-        # Generate speech using gTTS
-        tts = gTTS(text, lang=lang, slow=False)
-        mp3_fp = BytesIO()
-        tts.write_to_fp(mp3_fp)
-        mp3_fp.seek(0)
+        .chat-bubble {
+            background-color: #e1f5fe;
+            padding: 10px 15px;
+            border-radius: 20px;
+            margin: 10px 0;
+            max-width: 80%;
+        }
+        .wave-placeholder {
+            width: 100%;
+            height: 40px;
+            background: linear-gradient(90deg, #0099ff, #33ccff);
+            animation: wave 1.5s infinite ease-in-out;
+        }
+        @keyframes wave {
+            0% {opacity: 0.3;}
+            50% {opacity: 1;}
+            100% {opacity: 0.3;}
+        }
+    </style>
+""", unsafe_allow_html=True)
 
-        # Play the audio
-        st.audio(mp3_fp, format="audio/mp3")
+# Header
+st.markdown("## 🗣️ Talking Text")
+st.write("Type your text and hear it spoken in a natural voice. PNG accent available.")
 
-        # Allow download
-        st.download_button(
-            label="Download Audio",
-            data=mp3_fp,
-            file_name="speech.mp3",
-            mime="audio/mpeg"
-        )
+# Voice options
+voice_options = {
+    "Default (US English)": "Rachel",
+    "Papua New Guinea Style (Closest Match)": "Matilda"  # Replace with your own voice ID if needed
+}
+voice_choice = st.selectbox("Choose a voice", list(voice_options.keys()))
+voice_id = voice_options[voice_choice]
 
-# Optional display of uploaded audio
-if uploaded_audio:
-    st.markdown("**Your uploaded recording:**")
-    st.audio(uploaded_audio)
+# ElevenLabs API setup
+api_key = st.secrets.get("elevenlabs_api_key") or st.text_input("Enter your ElevenLabs API Key", type="password")
+
+# Chat-style input
+user_input = st.chat_input("Type something to say...")
+
+if user_input and api_key:
+    with st.spinner("Generating audio..."):
+        # Call ElevenLabs API
+        url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
+        headers = {
+            "xi-api-key": api_key,
+            "Content-Type": "application/json"
+        }
+        data = {
+            "text": user_input,
+            "model_id": "eleven_monolingual_v1",
+            "voice_settings": {
+                "stability": 0.5,
+                "similarity_boost": 0.75
+            }
+        }
+        response = requests.post(url, json=data, headers=headers)
+
+        if response.status_code == 200:
+            audio = response.content
+            audio_b64 = base64.b64encode(audio).decode("utf-8")
+
+            # Show chat bubble
+            st.markdown(f'<div class="chat-bubble">{user_input}</div>', unsafe_allow_html=True)
+
+            # Show soundwave animation placeholder
+            st.markdown('<div class="wave-placeholder"></div>', unsafe_allow_html=True)
+
+            # Play and download audio
+            st.audio(audio, format="audio/mp3")
+            st.download_button("Download Audio", audio, file_name="talking_text.mp3")
+        else:
+            st.error("Something went wrong. Please check your API key or try again later.")
+
+elif not api_key:
+    st.info("Please enter your ElevenLabs API key above to continue.")
